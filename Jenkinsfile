@@ -43,7 +43,7 @@ pipeline {
                         bat 'mvnw clean package -e'
                     }
                 }
-                echo '.....Source code packaging completed'
+                echo '.....Source code packaging completed!'
             }
         }
     }
