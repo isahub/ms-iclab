@@ -46,5 +46,26 @@ pipeline {
                 echo '.....Source code packaging completed'
             }
         }
+        stage('sonarqube') {
+            steps {
+                echo 'Sonar scan in progress.....'
+                script {
+                    if(isUnix()) {
+                        echo 'Unix OS'
+                        sh './mvnw clean verify sonar:sonar \
+                             -Dsonar.projectKey=ms-iclab \
+                             -Dsonar.host.url=https://3818-186-175-87-17.sa.ngrok.io \
+                             -Dsonar.login=sqp_69b753e9bbe8205404785182a4e8edd066c980bb'
+                    } else {
+                        echo 'Windows OS'
+                        bat 'mvnw clean verify sonar:sonar \
+                                -Dsonar.projectKey=ms-iclab \
+                                -Dsonar.host.url=https://3818-186-175-87-17.sa.ngrok.io \
+                                -Dsonar.login=sqp_69b753e9bbe8205404785182a4e8edd066c980bb'
+                    }
+                }
+                echo '.....Sonar scan completed'
+            }
+        }
     }
 }
