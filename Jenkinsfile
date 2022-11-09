@@ -66,5 +66,10 @@ pipeline {
                 }
             }
         }
+        stage('notification') {
+            steps {
+               slackSend message: 'Notification message from ms-iclab project'
+            }
+        }
     }
  }
