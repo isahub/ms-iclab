@@ -49,7 +49,7 @@ pipeline {
         stage('SonarQube analysis') {
             steps {
                 echo 'Sonar scan in progress.....'
-                withSonarQubeEnv(credentialsId: 'sonartoken', installationName: 'Sonita') {
+                withSonarQubeEnv(credentialsId: 'TokenJenkinsSonar', installationName: 'Sonita') {
                     script {
                         if(isUnix()) {
                             echo 'Unix OS'
