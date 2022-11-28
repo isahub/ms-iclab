@@ -49,13 +49,12 @@ pipeline {
         stage('SonarQube analysis') {
             steps {
                 echo 'Sonar scan in progress.....'
-                withSonarQubeEnv(credentialsId: '22f7a5b8-3425-4d58-a9e9-2326e6749326', installationName: 'sonarqube') {
+                withSonarQubeEnv(credentialsId: 'sonartoken', installationName: 'sqscanner') {
                     script {
                         if(isUnix()) {
                             echo 'Unix OS'
                                 sh './mvnw clean verify sonar:sonar \
-                                     -Dsonar.projectKey=ms-iclab \
-                                     -Dsonar.projectName=ms-iclab'
+                                     -Dsonar.projectKey=ms-iclab  -Dsonar.projectName=ms-iclab'
                         } else {
                             echo 'Windows OS'
                                 bat 'mvnw clean verify sonar:sonar \
