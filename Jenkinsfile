@@ -9,9 +9,9 @@ pipeline {
     stages {
         stage('compile') {
             steps {
-                lastStage = "${env.STAGE_NAME}"
                 echo 'Source code compilation in progress.....'
                 script {
+                    lastStage = "${env.STAGE_NAME}"
                     if(isUnix()) {
                         echo 'Unix OS'
                         sh './mvnw clean compile -e'
@@ -26,7 +26,7 @@ pipeline {
         }
         stage('test') {
             steps {
-                lastStage = "${env.STAGE_NAME}"
+                //lastStage = "${env.STAGE_NAME}"
                 echo 'Source code testing in progress.....'
                 script {
                     if(isUnix()) {
@@ -43,7 +43,7 @@ pipeline {
         }
         stage('package') {
             steps {
-                lastStage = "${env.STAGE_NAME}"
+                //lastStage = "${env.STAGE_NAME}"
                 echo 'Source code packaging in progress.....'
                 script {
                     if(isUnix()) {
@@ -60,10 +60,10 @@ pipeline {
         }
         stage('SonarQube analysis') {
             steps {
-                lastStage = "${env.STAGE_NAME}"
                 echo 'Sonar scan in progress.....'
                 withSonarQubeEnv(credentialsId: '___TokenJenkinsSonar', installationName: 'Sonita') {
                     script {
+                        lastStage = "${env.STAGE_NAME}"
                         if(isUnix()) {
                             echo 'Unix OS'
                                 sh './mvnw clean verify sonar:sonar \
@@ -84,7 +84,7 @@ pipeline {
         stage("uploadNexus") {
             //when { branch 'main'}
             steps {
-                lastStage = "${env.STAGE_NAME}"
+                //lastStage = "${env.STAGE_NAME}"
                 echo 'Uploading to nexus in progress.....'
                 script {
                     pom = readMavenPom file: "pom.xml";
@@ -121,7 +121,7 @@ pipeline {
         stage('Nexus download & test') {
             //when { branch 'main'}
             steps {
-                lastStage = "${env.STAGE_NAME}"
+                //lastStage = "${env.STAGE_NAME}"
                 withCredentials([usernamePassword(credentialsId: 'acd50057-3abc-4c5b-a062-758a404e0bb9', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     script {
                         echo "Downloading artifact from nexus"
