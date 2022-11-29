@@ -60,10 +60,11 @@ pipeline {
         }
         stage('SonarQube analysis') {
             steps {
+                script { lastStage = "${env.STAGE_NAME}"}
                 echo 'Sonar scan in progress.....'
                 withSonarQubeEnv(credentialsId: '___TokenJenkinsSonar', installationName: 'Sonita') {
                     script {
-                        lastStage = "${env.STAGE_NAME}"
+                        //lastStage = "${env.STAGE_NAME}"
                         if(isUnix()) {
                             echo 'Unix OS'
                                 sh './mvnw clean verify sonar:sonar \
