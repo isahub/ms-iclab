@@ -49,7 +49,7 @@ pipeline {
                     }
                 }
                 echo '.....Source code packaging completed'
-                slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${env.STAGE_STATUS}]"
+                slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
         /*stage('SonarQube analysis') {
@@ -129,12 +129,12 @@ pipeline {
             }
         }*/             
     }
-    post { 
+    /*post { 
         success {
             slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.JOB_NAME}][Resultado: Éxito/Success]"
         }
         failure { 
             slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.JOB_NAME}][Resultado: Error/Fail]"
         }
-    }
+    }*/
  }
