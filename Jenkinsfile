@@ -19,6 +19,7 @@ pipeline {
                     }
                 }
                 echo '.....Source code compilation completed'
+                slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
         stage('test') {
@@ -34,6 +35,7 @@ pipeline {
                     }
                 }
                 echo '.....Source code testing completed'
+                slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
         stage('package') {
@@ -52,7 +54,7 @@ pipeline {
                 slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
-        /*stage('SonarQube analysis') {
+        stage('SonarQube analysis') {
             steps {
                 echo 'Sonar scan in progress.....'
                 withSonarQubeEnv(credentialsId: 'TokenJenkinsSonar', installationName: 'Sonita') {
@@ -68,6 +70,7 @@ pipeline {
 
                         }
                         echo '.....Sonar scan completed'
+                        slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
                     }
                 }
             }
@@ -103,7 +106,8 @@ pipeline {
                                  ]
                             ]
                         )
-                    echo '.....Artifact Uploaded successfully'
+                        echo '.....Artifact Uploaded successfully'
+                        slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
                     } else {
                         error "File: ${artifactPath}, could not be found";
                     }
@@ -126,15 +130,16 @@ pipeline {
                         sh """curl -X GET -u $USER:$PASS http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
                     }
                 }
+                slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
-        }*/             
+        }             
     }
-    /*post { 
+    post { 
         success {
-            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.JOB_NAME}][Resultado: Éxito/Success]"
+            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Resultado: Éxito/Success]"
         }
         failure { 
-            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.JOB_NAME}][Resultado: Error/Fail]"
+            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Resultado: Error/Fail]"
         }
-    }*/
+    }
  }
