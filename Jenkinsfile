@@ -26,9 +26,9 @@ pipeline {
         }
         stage('test') {
             steps {
-                //lastStage = "${env.STAGE_NAME}"
                 echo 'Source code testing in progress.....'
                 script {
+                    lastStage = "${env.STAGE_NAME}"
                     if(isUnix()) {
                         echo 'Unix OS'
                         sh './mvnw clean test -e'
@@ -43,9 +43,9 @@ pipeline {
         }
         stage('package') {
             steps {
-                //lastStage = "${env.STAGE_NAME}"
                 echo 'Source code packaging in progress.....'
                 script {
+                    lastStage = "${env.STAGE_NAME}"
                     if(isUnix()) {
                         echo 'Unix OS'
                         sh './mvnw clean package -e'
@@ -62,9 +62,8 @@ pipeline {
             steps {
                 script { lastStage = "${env.STAGE_NAME}"}
                 echo 'Sonar scan in progress.....'
-                withSonarQubeEnv(credentialsId: '___TokenJenkinsSonar', installationName: 'Sonita') {
+                withSonarQubeEnv(credentialsId: 'TokenJenkinsSonar', installationName: 'Sonita') {
                     script {
-                        //lastStage = "${env.STAGE_NAME}"
                         if(isUnix()) {
                             echo 'Unix OS'
                                 sh './mvnw clean verify sonar:sonar \
@@ -76,7 +75,6 @@ pipeline {
 
                         }
                         echo '.....Sonar scan completed'
-                        //slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
                     }
                 }
             }
@@ -85,9 +83,9 @@ pipeline {
         stage("uploadNexus") {
             //when { branch 'main'}
             steps {
-                //lastStage = "${env.STAGE_NAME}"
                 echo 'Uploading to nexus in progress.....'
                 script {
+                    lastStage = "${env.STAGE_NAME}"
                     pom = readMavenPom file: "pom.xml";
                     files = findFiles(glob: "build/*.${pom.packaging}");
                     artifactPath = files[0].path;
@@ -113,7 +111,6 @@ pipeline {
                         )
                         echo '.....Artifact Uploaded successfully'
                     } else {
-                        slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
                         error "File: ${artifactPath}, could not be found";
                     }
                 }
@@ -121,8 +118,8 @@ pipeline {
         }
         stage('Nexus download & test') {
             //when { branch 'main'}
-            steps {
-                //lastStage = "${env.STAGE_NAME}"
+                steps {
+                script { lastStage = "${env.STAGE_NAME}"}
                 withCredentials([usernamePassword(credentialsId: 'acd50057-3abc-4c5b-a062-758a404e0bb9', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     script {
                         echo "Downloading artifact from nexus"
@@ -132,8 +129,7 @@ pipeline {
                         sh """curl -X GET -u $USER:$PASS http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
                     }
                 }
-                //slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
-            }
+             }
         }             
     }
     post { 
