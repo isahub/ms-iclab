@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        NEXUS_INSTANCE_ID = "nexus"
+        NEXUS_INSTANCE_ID = "mxs01"
         NEXUS_REPOSITORY = "devops-usach-nexus"
         NEXUS_SERVER = "nexus:8081"
     }
@@ -81,18 +81,9 @@ pipeline {
                 script {
                     pom = readMavenPom file: "pom.xml";
                     files = findFiles(glob: "build/*.${pom.packaging}");
-                    echo """${files[0].name},
-                            ${files[0].path},
-                            ${files[0].directory},
-                            ${files[0].length},
-                            ${files[0].lastModified}"""
                     artifactPath = files[0].path;
                     artifactExists = fileExists artifactPath;
                     if(artifactExists) {
-                        echo """File: ${artifactPath},
-                              group: ${pom.groupId},
-                              packaging: ${pom.packaging},
-                              version ${pom.version}"""
                         nexusPublisher(
                             nexusInstanceId: NEXUS_INSTANCE_ID,
                             nexusRepositoryId: NEXUS_REPOSITORY,
@@ -137,10 +128,15 @@ pipeline {
             }
         }
 
-        stage('notification') {
-            steps {
-               slackSend message: 'Notification message from ms-iclab project'
+        post { 
+            success {
+                slackSend channel:"grupo6" message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.JOB_NAME}][Resultado: Éxito/Success]"
             }
+            failure { 
+                slackSend channel:"grupo6" message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.JOB_NAME}][Resultado: Error/Fail]"
+            }
+
         }
+               
     }
  }
