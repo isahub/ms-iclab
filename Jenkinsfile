@@ -51,7 +51,7 @@ pipeline {
                 echo '.....Source code packaging completed'
             }
         }
-        stage('SonarQube analysis') {
+        /*stage('SonarQube analysis') {
             steps {
                 echo 'Sonar scan in progress.....'
                 withSonarQubeEnv(credentialsId: 'TokenJenkinsSonar', installationName: 'Sonita') {
@@ -126,7 +126,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
 
         post { 
             success {
