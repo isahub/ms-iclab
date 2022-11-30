@@ -144,10 +144,10 @@ pipeline {
     }
     post { 
         success {
-            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Resultado: Éxito/Success]"
+            slackSend channel:"lab-ceres-mod4-sec1-status", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Resultado: Éxito/Success]"
         }
         failure { 
-            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${lastStage}] [Resultado: Error/Fail]"
+            slackSend channel:"lab-ceres-mod4-sec1-status", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${lastStage}] [Resultado: Error/Fail]"
         }
     }
  }
