@@ -136,8 +136,8 @@ pipeline {
                     passwordVariable: 'GIT_PASSWORD']]) {
                         script {
                             pom = readMavenPom file: "pom.xml";
-                            sh """git tag v${pom.version}"""
-                            sh """git push v${pom.version} https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git --tags"""
+                            sh """git tag ${pom.version}"""
+                            sh """git push ${pom.version} https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git --tags"""
                         }
                     }
             }
