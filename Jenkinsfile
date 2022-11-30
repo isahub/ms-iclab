@@ -114,7 +114,7 @@ pipeline {
             }
         }
         stage('Nexus download & test') {
-            when { branch 'main'}
+            when { branch 'main' credentialsId: 'a3835f6e-f100-43ad-92ea-b95a7929dca1', url: 'https://github.com/isahub/ms-iclab.git'}
                 steps {
                 script { lastStage = "${env.STAGE_NAME}"}
                     script {
@@ -122,7 +122,11 @@ pipeline {
                         pom = readMavenPom file: "pom.xml";
                         groupId = pom.groupId;
                         groupIdPath = groupId.replace(".", "/");
-                         sh """curl -X GET http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
+                        sh """curl -X GET http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
+                        sh """
+                        git tag ${pom.version}
+                        git push origin --tags
+                        """
                     }
              }
         }             
