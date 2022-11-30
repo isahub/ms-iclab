@@ -123,17 +123,13 @@ pipeline {
                         groupId = pom.groupId;
                         groupIdPath = groupId.replace(".", "/");
                         sh """curl -X GET http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
-                        sh """
-                        git tag ${pom.version}
-                        git push origin --tags
-                        """
                     }
              }
         }
         stage("Tag Github") {
                steps {
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', 
-                credentialsId: 'MyID', 
+                credentialsId: 'ms-iclab', 
                 usernameVariable: 'GIT_USERNAME', 
                 passwordVariable: 'GIT_PASSWORD']]) {    
                     script {
