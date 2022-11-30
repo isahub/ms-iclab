@@ -137,7 +137,7 @@ pipeline {
                         script {
                             pom = readMavenPom file: "pom.xml";
                             sh """git tag ${pom.version}"""
-                            sh """git push ${pom.version} https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git --tags"""
+                            sh """git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git ${pom.version}"""
                         }
                     }
             }
