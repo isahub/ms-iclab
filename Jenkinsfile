@@ -120,7 +120,7 @@ pipeline {
             //when { branch 'main'}
                 steps {
                 script { lastStage = "${env.STAGE_NAME}"}
-                withCredentials([usernamePassword(credentialsId: 'acd50057-3abc-4c5b-a062-758a404e0bb9', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                //withCredentials([usernamePassword(credentialsId: 'acd50057-3abc-4c5b-a062-758a404e0bb9', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     script {
                         echo "Downloading artifact from nexus"
                         pom = readMavenPom file: "pom.xml";
