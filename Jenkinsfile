@@ -81,7 +81,7 @@ pipeline {
         }
         
         stage("uploadNexus") {
-            //when { branch 'main'}
+            when { branch 'main'}
             steps {
                 echo 'Uploading to nexus in progress.....'
                 script {
@@ -117,19 +117,16 @@ pipeline {
             }
         }
         stage('Nexus download & test') {
-            //when { branch 'main'}
+            when { branch 'main'}
                 steps {
                 script { lastStage = "${env.STAGE_NAME}"}
-                //withCredentials([usernamePassword(credentialsId: 'acd50057-3abc-4c5b-a062-758a404e0bb9', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     script {
                         echo "Downloading artifact from nexus"
                         pom = readMavenPom file: "pom.xml";
                         groupId = pom.groupId;
                         groupIdPath = groupId.replace(".", "/");
-                        //sh """curl -X GET -u $USER:$PASS http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
-                        sh """curl -X GET http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
+                         sh """curl -X GET http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
                     }
-                //}
              }
         }             
     }
