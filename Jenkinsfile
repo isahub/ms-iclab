@@ -129,14 +129,15 @@ pipeline {
         stage("Tag Github") {
             when { branch 'main' }
             steps {
+                script { lastStage = "${env.STAGE_NAME}"}
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', 
                     credentialsId: 'ms-iclab', 
                     usernameVariable: 'GIT_USERNAME', 
                     passwordVariable: 'GIT_PASSWORD']]) {
                         script {
                             pom = readMavenPom file: "pom.xml";
-                            sh """git tag ${pom.version}"""
-                            sh """git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git --tags"""
+                            sh """git tag v${pom.version}"""
+                            sh """git push v${pom.version} https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git --tags"""
                         }
                     }
             }
