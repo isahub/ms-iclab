@@ -114,25 +114,40 @@ pipeline {
             }
         }
         stage('Nexus download & test') {
-            when { branch 'main'}
+            when { branch 'main' }
                 steps {
-                script { lastStage = "${env.STAGE_NAME}"}
+                    script { lastStage = "${env.STAGE_NAME}"}
                     script {
                         echo "Downloading artifact from nexus"
                         pom = readMavenPom file: "pom.xml";
                         groupId = pom.groupId;
                         groupIdPath = groupId.replace(".", "/");
-                         sh """curl -X GET http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
+                        sh """curl -X GET http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
                     }
              }
-        }             
+        }
+        stage("Tag Github") {
+            when { branch 'main' }
+            steps {
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', 
+                    credentialsId: 'ms-iclab', 
+                    usernameVariable: 'GIT_USERNAME', 
+                    passwordVariable: 'GIT_PASSWORD']]) {
+                        script {
+                            pom = readMavenPom file: "pom.xml";
+                            sh """git tag ${pom.version}"""
+                            sh """git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git --tags"""
+                        }
+                    }
+            }
+        }
     }
     post { 
         success {
-            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Resultado: Éxito/Success]"
+            slackSend channel:"lab-ceres-mod4-sec1-status", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Resultado: Éxito/Success]"
         }
         failure { 
-            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${lastStage}] [Resultado: Error/Fail]"
+            slackSend channel:"lab-ceres-mod4-sec1-status", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${lastStage}] [Resultado: Error/Fail]"
         }
     }
  }
