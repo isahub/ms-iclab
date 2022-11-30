@@ -127,6 +127,7 @@ pipeline {
              }
         }
         stage("Tag Github") {
+            when { branch 'main' }
             steps {
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', 
                     credentialsId: 'ms-iclab', 
