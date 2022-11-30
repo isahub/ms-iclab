@@ -129,7 +129,21 @@ pipeline {
                         """
                     }
              }
-        }             
+        }
+        stage("Tag Github") {
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', 
+                credentialsId: 'MyID', 
+                usernameVariable: 'GIT_USERNAME', 
+                passwordVariable: 'GIT_PASSWORD']]) {    
+                steps {
+                    script {
+                        pom = readMavenPom file: "pom.xml";
+                        sh """git tag ${pom.version}"""
+                         sh """git push https://${GIT_USERNAME}:${GIT_PASSWORD}@https://github.com/isahub/ms-iclab.git --tags"""
+                    }
+                }
+            }
+        }
     }
     post { 
         success {
