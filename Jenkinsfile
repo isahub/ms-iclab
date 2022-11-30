@@ -131,11 +131,11 @@ pipeline {
              }
         }
         stage("Tag Github") {
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', 
+               steps {
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', 
                 credentialsId: 'MyID', 
                 usernameVariable: 'GIT_USERNAME', 
                 passwordVariable: 'GIT_PASSWORD']]) {    
-                steps {
                     script {
                         pom = readMavenPom file: "pom.xml";
                         sh """git tag ${pom.version}"""
