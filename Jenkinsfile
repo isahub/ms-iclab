@@ -21,7 +21,6 @@ pipeline {
                     }
                 } 
                 echo '.....Source code compilation completed'
-                //slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
         stage('test') {
@@ -38,7 +37,6 @@ pipeline {
                     }
                 }
                 echo '.....Source code testing completed'
-                //slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
         stage('package') {
@@ -55,8 +53,7 @@ pipeline {
                     }
                 } 
                 echo '.....Source code packaging completed'
-                //slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
-            }
+             }
         }
         stage('SonarQube analysis') {
             steps {
