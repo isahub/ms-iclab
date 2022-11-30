@@ -116,7 +116,7 @@ pipeline {
         stage('Nexus download & test') {
             when { branch 'main' }
                 steps {
-                script { lastStage = "${env.STAGE_NAME}"}
+                    script { lastStage = "${env.STAGE_NAME}"}
                     script {
                         echo "Downloading artifact from nexus"
                         pom = readMavenPom file: "pom.xml";
@@ -131,17 +131,17 @@ pipeline {
              }
         }
         stage("Tag Github") {
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', 
-                credentialsId: 'MyID', 
-                usernameVariable: 'GIT_USERNAME', 
-                passwordVariable: 'GIT_PASSWORD']]) {
-                steps {
-                    script {
-                        pom = readMavenPom file: "pom.xml";
-                        sh """git tag ${pom.version}"""
-                         sh """git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git --tags"""
+            steps {
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', 
+                    credentialsId: 'MyID', 
+                    usernameVariable: 'GIT_USERNAME', 
+                    passwordVariable: 'GIT_PASSWORD']]) {
+                        script {
+                            pom = readMavenPom file: "pom.xml";
+                            sh """git tag ${pom.version}"""
+                            sh """git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/isahub/ms-iclab.git --tags"""
+                        }
                     }
-                }
             }
         }
     }
