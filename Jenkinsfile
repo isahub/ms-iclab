@@ -114,7 +114,7 @@ pipeline {
             }
         }
         stage('Nexus download & test') {
-            when { branch 'main' credentialsId: 'a3835f6e-f100-43ad-92ea-b95a7929dca1', url: 'https://github.com/isahub/ms-iclab.git'}
+            when { branch 'main' }
                 steps {
                 script { lastStage = "${env.STAGE_NAME}"}
                     script {
