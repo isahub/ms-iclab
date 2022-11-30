@@ -1,10 +1,17 @@
 pipeline {
     agent any
+    environment {
+        NEXUS_INSTANCE_ID = "mxs01"
+        NEXUS_REPOSITORY = "devops-usach-nexus"
+        NEXUS_SERVER = "nexus:8081"
+        lastStage = ""
+    }
     stages {
         stage('compile') {
             steps {
                 echo 'Source code compilation in progress.....'
                 script {
+                    lastStage = "${env.STAGE_NAME}"
                     if(isUnix()) {
                         echo 'Unix OS'
                         sh './mvnw clean compile -e'
@@ -12,14 +19,16 @@ pipeline {
                         echo 'Windows OS'
                         bat 'mvnw clean compile -e'
                     }
-                }
+                } 
                 echo '.....Source code compilation completed'
+                //slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
         stage('test') {
             steps {
                 echo 'Source code testing in progress.....'
                 script {
+                    lastStage = "${env.STAGE_NAME}"
                     if(isUnix()) {
                         echo 'Unix OS'
                         sh './mvnw clean test -e'
@@ -29,12 +38,14 @@ pipeline {
                     }
                 }
                 echo '.....Source code testing completed'
+                //slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
         stage('package') {
             steps {
                 echo 'Source code packaging in progress.....'
                 script {
+                    lastStage = "${env.STAGE_NAME}"
                     if(isUnix()) {
                         echo 'Unix OS'
                         sh './mvnw clean package -e'
@@ -42,19 +53,21 @@ pipeline {
                         echo 'Windows OS'
                         bat 'mvnw clean package -e'
                     }
-                }
+                } 
                 echo '.....Source code packaging completed'
+                //slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${env.STAGE_NAME}][Resultado: ${currentBuild.currentResult}]"
             }
         }
         stage('SonarQube analysis') {
             steps {
+                script { lastStage = "${env.STAGE_NAME}"}
                 echo 'Sonar scan in progress.....'
-                withSonarQubeEnv(credentialsId: '22f7a5b8-3425-4d58-a9e9-2326e6749326', installationName: 'sonarqube') {
+                withSonarQubeEnv(credentialsId: 'TokenJenkinsSonar', installationName: 'Sonita') {
                     script {
                         if(isUnix()) {
                             echo 'Unix OS'
                                 sh './mvnw clean verify sonar:sonar \
-                                     -Dsonar.projectKey=ms-iclab'
+                                     -Dsonar.projectKey=ms-iclab  -Dsonar.projectName=ms-iclab'
                         } else {
                             echo 'Windows OS'
                                 bat 'mvnw clean verify sonar:sonar \
@@ -66,10 +79,63 @@ pipeline {
                 }
             }
         }
-        stage('notification') {
+        
+        stage("uploadNexus") {
+            when { branch 'main'}
             steps {
-               slackSend message: 'Notification message from ms-iclab project'
+                echo 'Uploading to nexus in progress.....'
+                script {
+                    lastStage = "${env.STAGE_NAME}"
+                    pom = readMavenPom file: "pom.xml";
+                    files = findFiles(glob: "build/*.${pom.packaging}");
+                    artifactPath = files[0].path;
+                    artifactExists = fileExists artifactPath;
+                    if(artifactExists) {
+                        nexusPublisher(
+                            nexusInstanceId: NEXUS_INSTANCE_ID,
+                            nexusRepositoryId: NEXUS_REPOSITORY,
+                            packages: [
+                                [
+                                    $class: 'MavenPackage',
+                                    mavenAssetList: [
+                                        [classifier: '',
+                                        extension: '',
+                                        filePath: artifactPath]],
+                                    mavenCoordinate:
+                                        [artifactId: pom.artifactId,
+                                        groupId: pom.groupId,
+                                        packaging: pom.packaging,
+                                        version: pom.version]
+                                 ]
+                            ]
+                        )
+                        echo '.....Artifact Uploaded successfully'
+                    } else {
+                        error "File: ${artifactPath}, could not be found";
+                    }
+                }
             }
+        }
+        stage('Nexus download & test') {
+            when { branch 'main'}
+                steps {
+                script { lastStage = "${env.STAGE_NAME}"}
+                    script {
+                        echo "Downloading artifact from nexus"
+                        pom = readMavenPom file: "pom.xml";
+                        groupId = pom.groupId;
+                        groupIdPath = groupId.replace(".", "/");
+                         sh """curl -X GET http://${env.NEXUS_SERVER}/repository/${env.NEXUS_REPOSITORY}/${groupIdPath}/${pom.artifactId}/${pom.version}/${pom.artifactId}-${pom.version}.${pom.packaging} -O"""
+                    }
+             }
+        }             
+    }
+    post { 
+        success {
+            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Resultado: Éxito/Success]"
+        }
+        failure { 
+            slackSend channel:"grupo6", message: "[Grupo6][Pipeline IC/CD][Rama: ${env.BRANCH_NAME}][Stage: ${lastStage}] [Resultado: Error/Fail]"
         }
     }
  }
