@@ -133,7 +133,7 @@ pipeline {
         stage("Tag Github") {
             steps {
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', 
-                    credentialsId: 'MyID', 
+                    credentialsId: 'ms-iclab', 
                     usernameVariable: 'GIT_USERNAME', 
                     passwordVariable: 'GIT_PASSWORD']]) {
                         script {
